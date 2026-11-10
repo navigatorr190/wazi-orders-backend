@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Commander - WAZI STORE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            /* Fond dégradé bleu ciel très léger */
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
+            margin: 0; 
+            padding: 0; 
+            color: #0f172a; /* Texte bleu nuit très foncé pour une bonne lisibilité */
+            line-height: 1.5; 
+            min-height: 100vh; 
+        }
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
+        
+        /* BANDEAU HAUT */
+        .top-banner { 
+            /* Dégradé bleu ciel vers bleu océan */
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); 
+        }
+
+        /* BARRE D'ÉTAPES */
+        .steps { display: flex; justify-content: center; margin-bottom: 25px; font-size: 12px; color: #64748b; font-weight: 500; background: white; padding: 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .steps span { margin: 0 10px; } 
+        .steps .active { color: #0284c7; font-weight: 700; } /* Bleu ciel foncé */
+
+        /* RÉSUMÉ PRODUIT */
+        .product-summary { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #bae6fd; border-radius: 12px; margin-bottom: 20px; background: white; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1); }
+        .product-img-small { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; background: #f1f5f9; }
+        .product-details { flex-grow: 1; } 
+        .product-name { font-weight: 700; font-size: 16px; margin: 0 0 5px 0; color: #0f172a; } 
+        .product-variant { font-size: 13px; color: #64748b; margin: 0; }
+        
+        .free-shipping-badge { background: #22c55e; color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3); }
+
+        /* CARTES DE BUNDLES */
+        .bundle-grid { display: grid; gap: 12px; margin-bottom: 25px; }
+        .bundle-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 18px 15px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        
+        /* Carte sélectionnée : Bordure bleu ciel */
+        .bundle-card.active { border-color: #38bdf8; background-color: #f0f9ff; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); }
+        
+        /* Badge Populaire */
+        .bundle-badge { position: absolute; top: -12px; right: 15px; background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(56, 189, 248, 0.3); }
+        
+        .bundle-info { display: flex; flex-direction: column; } 
+        .bundle-title { font-weight: 700; font-size: 16px; margin-bottom: 3px; color: #0f172a; } 
+        .bundle-subtitle { font-size: 13px; color: #0284c7; font-weight: 600; } /* Texte réduction en bleu ciel foncé */
+        .bundle-price-tag { font-weight: 800; font-size: 18px; color: #0f172a; } /* Prix en bleu nuit */
+
+        /* FORMULAIRE */
+        .form-group { margin-bottom: 15px; } 
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        .form-group input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; background-color: #f8fafc; transition: all 0.2s; }
+        
+        /* Focus des inputs : Bleu ciel */
+        .form-group input:focus { outline: none; border-color: #38bdf8; background-color: #fff; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        
+        .form-row { display: flex; gap: 10px; } 
+        .form-row .form-group { flex: 1; }
+        
+        /* Champ téléphone */
+        .phone-input-group { display: flex; gap: 8px; }
+        .indicatif-box { width: 80px; text-align: center; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px 0; color: #0f172a; }
+        .phone-input-group input { flex: 1; }
+
+        /* BOUTON PRINCIPAL : Bleu ciel */
+        .btn-order { 
+            width: 100%; padding: 18px; 
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); /* Dégradé bleu ciel */
+            color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; 
+            cursor: pointer; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4); transition: transform 0.1s, box-shadow 0.2s; 
+        }
+        .btn-order:active { transform: scale(0.98); } 
+        .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+        /* BADGE SÉCURITÉ */
+        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 12px; color: #64748b; font-weight: 500; } 
+        .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; } 
+
+        /* NOTIFICATION */
+        .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #0f172a; color: white; padding: 15px; border-radius: 8px; font-weight: 500; text-align: center; display: none; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-banner">⏱️ Commandez maintenant, nous vous appelons dans les 24h !</div>
+    <div class="steps"><span class="active">1. Produit</span><span>2. Livraison</span><span>3. Confirmation</span></div>
+
+    <div class="product-summary">
+        <img src="" alt="Produit" class="product-img-small" id="product-image">
+        <div class="product-details">
+            <p class="product-name" id="product-name">Chargement...</p>
+            <p class="product-variant" id="product-variant">Veuillez patienter...</p>
+            <span class="free-shipping-badge">Livraison Gratuite</span>
+        </div>
+    </div>
+
+    <div class="bundle-grid" id="bundle-container"></div>
+
+    <form id="codForm" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1);">
+        <div class="form-row">
+            <div class="form-group"><label>Prénom *</label><input type="text" id="prenom" required placeholder="Mamadou"></div>
+            <div class="form-group"><label>Nom *</label><input type="text" id="nom" required placeholder="Diallo"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Numéro de téléphone *</label>
+            <div class="phone-input-group">
+                <input type="text" id="indicatif" class="indicatif-box" value="+224" readonly>
+                <input type="tel" id="telephone" required placeholder="622 00 00 00">
+            </div>
+        </div>
+
+        <div class="form-group"><label>Adresse de livraison *</label><input type="text" id="adresse" required placeholder="Quartier, Rue, Ville"></div>
+
+        <button type="submit" class="btn-order" id="btn-submit">
+            <span>Commander • Paiement à la livraison</span>
+            <span id="btn-price">--- GNF</span>
+        </button>
+    </form>
+
+    <div class="secure-badge">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        Paiement 100% sécurisé à la livraison
+    </div>
+</div>
+
+<div class="toast" id="toast">✅ Commande reçue ! Nous vous appelons sous 24h.</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productData = {
+        name: urlParams.get('nom') || "Montre de Luxe Élégante",
+        image: urlParams.get('image') || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+        basePrice: parseInt(urlParams.get('prix')) || 50000,
+        variant: urlParams.get('variant') || "Édition limitée"
+    };
+
+    document.getElementById('product-name').innerText = productData.name;
+    document.getElementById('product-variant').innerText = productData.variant;
+    document.getElementById('product-image').src = productData.image;
+
+    let detectedCountry = "Guinée";
+    let detectedDevise = "GNF";
+    let conversionRate = 1; 
+
+    const PRICE_2 = productData.basePrice * 2 - 20000;
+    const PRICE_3 = productData.basePrice * 3 - 30000;
+    let currentBundle = 1;
+
+    function formatPrice(price, devise) {
+        return Math.round(price).toLocaleString('fr-FR') + ' ' + devise;
+    }
+
+    function renderBundles() {
+        const container = document.getElementById('bundle-container');
+        const bundles = [
+            { qty: 1, price: productData.basePrice, label: "1 Unité", sub: "Prix standard", badge: null },
+            { qty: 2, price: PRICE_2, label: "2 Unités", sub: "Économisez 20 000 GNF", badge: "Populaire" },
+            { qty: 3, price: PRICE_3, label: "3 Unités", sub: "Économisez 30 000 GNF", badge: "Meilleure offre" }
+        ];
+
+        container.innerHTML = bundles.map(b => `
+            <div class="bundle-card ${b.qty === currentBundle ? 'active' : ''}" onclick="selectBundle(${b.qty}, this)">
+                ${b.badge ? `<div class="bundle-badge">${b.badge}</div>` : ''}
+                <div class="bundle-info">
+                    <span class="bundle-title">${b.label}</span>
+                    <span class="bundle-subtitle">${b.sub}</span>
+                </div>
+                <div class="bundle-price-tag">${formatPrice(b.price * conversionRate, detectedDevise)}</div>
+            </div>
+        `).join('');
+        updateButtonPrice();
+    }
+
+    function selectBundle(qty, element) {
+        currentBundle = qty;
+        document.querySelectorAll('.bundle-card').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        updateButtonPrice();
+    }
+
+    function updateButtonPrice() {
+        let price = productData.basePrice;
+        if (currentBundle === 2) price = PRICE_2;
+        if (currentBundle === 3) price = PRICE_3;
+        document.getElementById('btn-price').innerText = formatPrice(price * conversionRate, detectedDevise);
+    }
+
+    async function detectCountry() {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            const countryCode = data.country_code;
+            
+            const countryConfig = {
+                "GN": { name: "Guinée", dial: "+224", devise: "GNF", rate: 1 },
+                "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.1 },
+                "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.1 },
+                "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.1 },
+                "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.0001 },
+                "US": { name: "États-Unis", dial: "+1", devise: "USD", rate: 0.0001 }
+            };
+
+            if (countryConfig[countryCode]) {
+                detectedCountry = countryConfig[countryCode].name;
+                detectedDevise = countryConfig[countryCode].devise;
+                conversionRate = countryConfig[countryCode].rate;
+                document.getElementById('indicatif').value = countryConfig[countryCode].dial;
+            }
+            renderBundles();
+        } catch (error) {
+            console.log("Erreur de détection IP, on garde la Guinée par défaut.");
+            renderBundles();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        detectCountry(); 
+    });
+
+    document.getElementById('codForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerHTML = `<span>Traitement...</span>`;
+
+        let price = productData.basePrice;
+        if (currentBundle === 2) price = PRICE_2;
+        if (currentBundle === 3) price = PRICE_3;
+
+        const indicatif = document.getElementById('indicatif').value;
+        const numero = document.getElementById('telephone').value;
+        const fullPhoneNumber = indicatif + " " + numero;
+
+        const data = {
+            produit: productData.name,
+            quantite: currentBundle,
+            prix_total: Math.round(price * conversionRate),
+            devise: detectedDevise,
+            prenom: document.getElementById('prenom').value,
+            nom: document.getElementById('nom').value,
+            telephone: fullPhoneNumber,
+            pays: detectedCountry,
+            adresse: document.getElementById('adresse').value
+        };
+
+        try {
+            const response = await fetch('https://wazi-orders-backend.onrender.com/commande', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if(response.ok) {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                document.getElementById('codForm').reset();
+                currentBundle = 1;
+                renderBundles();
+                setTimeout(() => { toast.style.display = 'none'; }, 4000);
+                btn.disabled = false;
+                btn.innerHTML = `<span>Commander • Paiement à la livraison</span><span id="btn-price"></span>`;
+                updateButtonPrice();
+            } else {
+                alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+                btn.disabled = false;
+                btn.innerHTML = `<span>Réessayer</span>`;
+            }
+        } catch (error) {
+            alert('Erreur de connexion au serveur.');
+            btn.disabled = false;
+            btn.innerHTML = `<span>Réessayer</span>`;
+        }
+    });
+</script>
+</body>
+  </html>
