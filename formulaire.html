@@ -6,53 +6,35 @@
     <title>Commander - WAZI STORE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
-            margin: 0; 
-            padding: 0; 
-            color: #0f172a; 
-            line-height: 1.5; 
-            min-height: 100vh; 
-        }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); margin: 0; padding: 0; color: #0f172a; line-height: 1.5; min-height: 100vh; }
         .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-        
         .top-banner { background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); }
         .steps { display: flex; justify-content: center; margin-bottom: 25px; font-size: 12px; color: #64748b; font-weight: 500; background: white; padding: 10px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .steps span { margin: 0 10px; } .steps .active { color: #0284c7; font-weight: 700; }
-
         .product-summary { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #bae6fd; border-radius: 12px; margin-bottom: 20px; background: white; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1); }
         .product-img-small { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; background: #f1f5f9; }
-        .product-details { flex-grow: 1; } 
-        .product-name { font-weight: 700; font-size: 16px; margin: 0 0 5px 0; color: #0f172a; } 
-        .product-variant { font-size: 13px; color: #64748b; margin: 0; }
+        .product-details { flex-grow: 1; } .product-name { font-weight: 700; font-size: 16px; margin: 0 0 5px 0; color: #0f172a; } .product-variant { font-size: 13px; color: #64748b; margin: 0; }
         .free-shipping-badge { background: #22c55e; color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3); }
-
         .bundle-grid { display: grid; gap: 12px; margin-bottom: 25px; }
         .bundle-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 18px 15px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s; position: relative; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .bundle-card.active { border-color: #38bdf8; background-color: #f0f9ff; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); }
         .bundle-badge { position: absolute; top: -12px; right: 15px; background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); color: #fff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(56, 189, 248, 0.3); }
-        .bundle-info { display: flex; flex-direction: column; } 
-        .bundle-title { font-weight: 700; font-size: 16px; margin-bottom: 3px; color: #0f172a; } 
-        .bundle-subtitle { font-size: 13px; color: #0284c7; font-weight: 600; } 
-        .bundle-price-tag { font-weight: 800; font-size: 18px; color: #0f172a; } 
-
-        .form-group { margin-bottom: 15px; } 
-        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        .bundle-info { display: flex; flex-direction: column; } .bundle-title { font-weight: 700; font-size: 16px; margin-bottom: 3px; color: #0f172a; } .bundle-subtitle { font-size: 13px; color: #0284c7; font-weight: 600; } .bundle-price-tag { font-weight: 800; font-size: 18px; color: #0f172a; }
+        .form-group { margin-bottom: 15px; } .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
         .form-group input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; background-color: #f8fafc; transition: all 0.2s; }
         .form-group input:focus { outline: none; border-color: #38bdf8; background-color: #fff; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
-        .form-row { display: flex; gap: 10px; } .form-row .form-group { flex: 1; }
         
+        /* Style pour le champ en erreur */
+        .form-group input.error { border-color: #ef4444; background-color: #fef2f2; }
+        .error-msg { color: #ef4444; font-size: 11px; margin-top: 4px; display: none; }
+
+        .form-row { display: flex; gap: 10px; } .form-row .form-group { flex: 1; }
         .phone-input-group { display: flex; gap: 8px; }
         .indicatif-box { width: 80px; text-align: center; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px 0; color: #0f172a; }
         .phone-input-group input { flex: 1; }
-
         .btn-order { width: 100%; padding: 18px; background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4); transition: transform 0.1s, box-shadow 0.2s; }
         .btn-order:active { transform: scale(0.98); } .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
-
-        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 12px; color: #64748b; font-weight: 500; } 
-        .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; } 
+        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 12px; color: #64748b; font-weight: 500; } .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; }
         .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #0f172a; color: white; padding: 15px; border-radius: 8px; font-weight: 500; text-align: center; display: none; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
@@ -83,8 +65,10 @@
             <label>Numéro de téléphone *</label>
             <div class="phone-input-group">
                 <input type="text" id="indicatif" class="indicatif-box" value="+224" readonly>
-                <input type="tel" id="telephone" required placeholder="622 00 00 00" data-placeholder>
+                <input type="tel" id="telephone" required placeholder="622 00 00 00">
             </div>
+            <!-- Message d'erreur pour le numéro -->
+            <div class="error-msg" id="phone-error">Le format du numéro est incorrect pour ce pays.</div>
         </div>
 
         <div class="form-group"><label>Adresse de livraison *</label><input type="text" id="adresse" required placeholder="Quartier, Rue, Ville"></div>
@@ -119,6 +103,7 @@
     let detectedCountry = "Guinée";
     let detectedDevise = "GNF";
     let conversionRate = 1; 
+    let currentPhoneLength = 9; // Longueur par défaut (Guinée)
 
     const PRICE_2 = productData.basePrice * 2 - 20000;
     const PRICE_3 = productData.basePrice * 3 - 30000;
@@ -132,8 +117,8 @@
         const container = document.getElementById('bundle-container');
         const bundles = [
             { qty: 1, price: productData.basePrice, label: "1 Unité", sub: "Prix standard", badge: null },
-            { qty: 2, price: PRICE_2, label: "2 Unités", sub: "Économisez 20 000 GNF", badge: "Populaire" },
-            { qty: 3, price: PRICE_3, label: "3 Unités", sub: "Économisez 30 000 GNF", badge: "Meilleure offre" }
+            { qty: 2, price: PRICE_2, label: "2 Unités", sub: "Économisez 20 000", badge: "Populaire" },
+            { qty: 3, price: PRICE_3, label: "3 Unités", sub: "Économisez 30 000", badge: "Meilleure offre" }
         ];
 
         container.innerHTML = bundles.map(b => `
@@ -163,64 +148,96 @@
         document.getElementById('btn-price').innerText = formatPrice(price * conversionRate, detectedDevise);
     }
 
+    function applyCountry(countryCode, countryName) {
+        const config = {
+            // Ajout de "length" pour la validation du nombre de chiffres
+            "GN": { name: "Guinée", dial: "+224", devise: "GNF", rate: 1, format: "622 00 00 00", length: 9 },
+            "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.066, format: "77 000 00 00", length: 9 },
+            "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.066, format: "07 00 00 00 00", length: 10 },
+            "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.066, format: "70 00 00 00", length: 8 },
+            "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.00009, format: "06 00 00 00 00", length: 10 },
+            "DE": { name: "Allemagne", dial: "+49", devise: "EUR", rate: 0.00009, format: "015 000 000 00", length: 11 },
+            "US": { name: "États-Unis", dial: "+1", devise: "USD", rate: 0.0001, format: "(555) 000-0000", length: 10 },
+            "CA": { name: "Canada", dial: "+1", devise: "CAD", rate: 0.00013, format: "000-000-0000", length: 10 },
+            "GB": { name: "Royaume-Uni", dial: "+44", devise: "GBP", rate: 0.00008, format: "07000 000000", length: 11 }
+        };
+
+        if (config[countryCode]) {
+            const data = config[countryCode];
+            detectedCountry = data.name;
+            detectedDevise = data.devise;
+            conversionRate = data.rate;
+            currentPhoneLength = data.length; // Mise à jour de la longueur attendue
+            document.getElementById('indicatif').value = data.dial;
+            document.getElementById('telephone').setAttribute('placeholder', data.format);
+        } else {
+            detectedCountry = countryName || countryCode;
+            detectedDevise = "GNF"; 
+            conversionRate = 1;
+            currentPhoneLength = 9; // Par défaut
+            document.getElementById('indicatif').value = "+" + countryCode;
+            document.getElementById('telephone').setAttribute('placeholder', "Numéro de téléphone");
+        }
+
+        renderBundles();
+    }
+
     async function detectCountry() {
         try {
             const response = await fetch('https://ipapi.co/json/');
             if (response.ok) {
                 const data = await response.json();
-                updateCountry(data.country_code);
+                applyCountry(data.country_code, data.country_name);
                 return; 
             }
         } catch (error) {
-            console.log("API principale bloquée, tentative avec l'API de secours...");
+            console.log("API 1 échouée, essai API 2...");
         }
 
         try {
             const response = await fetch('https://api.country.is/');
             if (response.ok) {
                 const data = await response.json();
-                updateCountry(data.country);
+                applyCountry(data.country);
                 return;
             }
         } catch (error) {
-            console.log("API de secours bloquée. Utilisation de la Guinée par défaut.");
+            console.log("API 2 échouée, Guinée par défaut.");
         }
         
-        updateCountry("GN");
-    }
-
-    function updateCountry(countryCode) {
-        const config = {
-            "GN": { name: "Guinée", dial: "+224", devise: "GNF", rate: 1, format: "622 00 00 00" },
-            "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.066, format: "77 000 00 00" },
-            "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.066, format: "07 00 00 00 00" },
-            "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.066, format: "70 00 00 00" },
-            "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.0001, format: "06 00 00 00 00" },
-            "US": { name: "États-Unis", dial: "+1", devise: "USD", rate: 0.0001, format: "(555) 000-0000" }
-        };
-
-        const countryData = config[countryCode] || config["GN"];
-        
-        detectedCountry = countryData.name;
-        detectedDevise = countryData.devise;
-        conversionRate = countryData.rate;
-        
-        // Mise à jour de l'indicatif
-        document.getElementById('indicatif').value = countryData.dial;
-        
-        // Mise à jour du format à l'intérieur du champ (placeholder)
-        document.getElementById('telephone').setAttribute('placeholder', countryData.format);
-        
-        // Rafraîchir les prix
-        renderBundles();
+        applyCountry("GN", "Guinée");
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         detectCountry(); 
+        
+        // Validation en temps réel du numéro de téléphone
+        document.getElementById('telephone').addEventListener('input', function() {
+            const phoneInput = this;
+            const errorMsg = document.getElementById('phone-error');
+            // On compte uniquement les chiffres
+            const digits = phoneInput.value.replace(/\D/g, ''); 
+            
+            if (digits.length > 0 && digits.length !== currentPhoneLength) {
+                phoneInput.classList.add('error');
+                errorMsg.style.display = 'block';
+            } else {
+                phoneInput.classList.remove('error');
+                errorMsg.style.display = 'none';
+            }
+        });
     });
 
     document.getElementById('codForm').addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        // Validation finale avant envoi
+        const phoneDigits = document.getElementById('telephone').value.replace(/\D/g, '');
+        if (phoneDigits.length !== currentPhoneLength) {
+            alert(`Veuillez saisir un numéro valide (${currentPhoneLength} chiffres attendus pour ce pays).`);
+            return;
+        }
+
         const btn = document.getElementById('btn-submit');
         btn.disabled = true;
         btn.innerHTML = `<span>Traitement...</span>`;
@@ -275,4 +292,4 @@
     });
 </script>
 </body>
-    </html>
+</html>
