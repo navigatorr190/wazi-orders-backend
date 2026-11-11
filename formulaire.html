@@ -16,10 +16,12 @@
             line-height: 1.5; 
             width: 100%;
             overflow-x: hidden; 
+            padding-bottom: 20px;
         }
         
         .container { max-width: 480px; margin: 0 auto; padding: 15px; box-sizing: border-box; width: 100%; }
         
+        /* BANDEAU HAUT */
         .top-banner { 
             background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
             color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; 
@@ -40,6 +42,7 @@
         }
         .free-shipping-badge svg { width: 12px; height: 12px; fill: white; }
 
+        /* --- ANIMATIONS DES BLOCS BUNDLES --- */
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -102,6 +105,7 @@
         .delivery-info svg { width: 16px; height: 16px; fill: #22c55e; flex-shrink: 0; }
         .delivery-info span { color: #22c55e; font-weight: 700; }
 
+        /* --- BOUTON COMMANDER PRINCIPAL --- */
         @keyframes zoomInOut { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
 
         .btn-order { 
@@ -144,12 +148,11 @@
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
         }
 
-        /* --- POP-UP D'ENGAGEMENT (CENTRÉ ET FIXE) --- */
+        /* --- POP-UP D'ENGAGEMENT --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center;
             z-index: 9999; padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px);
-            /* Le pop-up est fixé par rapport à l'écran, pas à l'iframe */
         }
         .modal-content {
             background: #ffffff; padding: 25px 20px; border-radius: 16px; text-align: left; max-width: 380px; width: 100%;
@@ -297,7 +300,7 @@
     const productData = {
         name: urlParams.get('nom') || "Montre de Luxe Élégante",
         image: urlParams.get('image') || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-        basePrice: parseInt(urlParams.get('prix')) || 50000,
+        basePrice: parseInt(urlParams.get('prix')) || 75000,
         variant: urlParams.get('variant') || "Édition limitée"
     };
 
@@ -310,35 +313,65 @@
     let conversionRate = 1; 
     let currentPhoneLength = 9; 
 
-    const PRICE_2 = productData.basePrice * 2 - 20000;
-    const PRICE_3 = productData.basePrice * 3 - 30000;
+    const PRICE_2 = productData.basePrice * 2 - 25000; // -25 000 GNF
+    const PRICE_3 = productData.basePrice * 3 - 37500; // -37 500 GNF
     let currentBundle = 1;
 
+    // NOUVELLE FONCTION D'ARRONDI INTELLIGENT
+    function roundSmartPrice(price, devise) {
+        if (devise === "FCFA") {
+            // FCFA : Arrondir au multiple de 500 supérieur
+            return Math.ceil(price / 500) * 500;
+        } else if (devise === "EUR" || devise === "USD" || devise === "GBP" || devise === "CAD") {
+            // EURO / USD : Règle du 0.50
+            let integerPart = Math.floor(price);
+            let decimalPart = price - integerPart;
+
+            if (decimalPart < 0.50) {
+                return integerPart; // Vers le bas
+            } else {
+                return integerPart + 0.99; // Vers le haut avec ,99
+            }
+        } else {
+            // GNF : arrondir à l'unité
+            return Math.round(price);
+        }
+    }
+
     function formatPrice(price, devise) {
+        if (devise === "EUR" || devise === "USD" || devise === "GBP" || devise === "CAD") {
+            return price.toFixed(2).replace('.', ',') + ' ' + devise;
+        }
         return Math.round(price).toLocaleString('fr-FR') + ' ' + devise;
     }
 
     function renderBundles() {
         const container = document.getElementById('bundle-container');
         
-        const saving2 = Math.round(20000 * conversionRate);
-        const saving3 = Math.round(30000 * conversionRate);
+        const saving2 = Math.round(25000 * conversionRate);
+        const saving3 = Math.round(37500 * conversionRate);
         
         const totalBase1 = productData.basePrice * conversionRate;
         const totalBase2 = (productData.basePrice * 2) * conversionRate;
         const totalBase3 = (productData.basePrice * 3) * conversionRate;
         
-        const finalPrice1 = totalBase1;
-        const finalPrice2 = PRICE_2 * conversionRate;
-        const finalPrice3 = PRICE_3 * conversionRate;
+        // APPLICATION DE L'ARRONDI INTELLIGENT
+        const finalPrice1 = roundSmartPrice(totalBase1, detectedDevise);
+        const finalPrice2 = roundSmartPrice(PRICE_2 * conversionRate, detectedDevise);
+        const finalPrice3 = roundSmartPrice(PRICE_3 * conversionRate, detectedDevise);
+        
+        const oldPrice1 = null;
+        const oldPrice2 = roundSmartPrice(totalBase2, detectedDevise);
+        const oldPrice3 = roundSmartPrice(totalBase3, detectedDevise);
 
-        const percent2 = Math.round((saving2 / totalBase2) * 100);
-        const percent3 = Math.round((saving3 / totalBase3) * 100);
+        // Calcul du pourcentage réel
+        const percent2 = oldPrice2 ? Math.round(((oldPrice2 - finalPrice2) / oldPrice2) * 100) : 0;
+        const percent3 = oldPrice3 ? Math.round(((oldPrice3 - finalPrice3) / oldPrice3) * 100) : 0;
 
         const bundles = [
             { qty: 1, price: finalPrice1, oldPrice: null, percent: null, label: "Achetez 1 unité", badge: null },
-            { qty: 2, price: finalPrice2, oldPrice: totalBase2, percent: percent2, label: "Achetez 2 unités", badge: "Populaire" },
-            { qty: 3, price: finalPrice3, oldPrice: totalBase3, percent: percent3, label: "Achetez 3 unités", badge: "Meilleure offre" }
+            { qty: 2, price: finalPrice2, oldPrice: oldPrice2, percent: percent2, label: "Achetez 2 unités", badge: "Populaire" },
+            { qty: 3, price: finalPrice3, oldPrice: oldPrice3, percent: percent3, label: "Achetez 3 unités", badge: "Meilleure offre" }
         ];
 
         container.innerHTML = bundles.map(b => `
@@ -371,22 +404,35 @@
         if (currentBundle === 2) { price = PRICE_2; qtyText = "2 Unités"; }
         if (currentBundle === 3) { price = PRICE_3; qtyText = "3 Unités"; }
 
-        const formattedPrice = formatPrice(price * conversionRate, detectedDevise);
+        const finalPrice = roundSmartPrice(price * conversionRate, detectedDevise);
+        
+        const formattedPrice = formatPrice(finalPrice, detectedDevise);
         document.getElementById('btn-subtitle').innerText = `${qtyText} • ${formattedPrice}`;
         document.getElementById('sticky-price').innerText = formattedPrice;
     }
 
     function applyCountry(countryCode, countryName) {
         const config = {
+            // Guinée
             "GN": { name: "Guinée", dial: "+224", devise: "GNF", rate: 1, format: "622 00 00 00", length: 9 },
-            "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.066, format: "77 000 00 00", length: 9 },
-            "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.066, format: "07 00 00 00 00", length: 10 },
-            "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.066, format: "70 00 00 00", length: 8 },
-            "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.00009, format: "06 00 00 00 00", length: 10 },
-            "DE": { name: "Allemagne", dial: "+49", devise: "EUR", rate: 0.00009, format: "015 000 000 00", length: 11 },
-            "US": { name: "États-Unis", dial: "+1", devise: "USD", rate: 0.0001, format: "(555) 000-0000", length: 10 },
-            "CA": { name: "Canada", dial: "+1", devise: "CAD", rate: 0.00013, format: "000-000-0000", length: 10 },
-            "GB": { name: "Royaume-Uni", dial: "+44", devise: "GBP", rate: 0.00008, format: "07000 000000", length: 11 }
+            
+            // Pays de l'UEMOA (FCFA)
+            "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.0714, format: "77 000 00 00", length: 9 },
+            "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.0714, format: "07 00 00 00 00", length: 10 },
+            "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.0714, format: "70 00 00 00", length: 8 },
+            "BJ": { name: "Bénin", dial: "+229", devise: "FCFA", rate: 0.0714, format: "01 00 00 00 00", length: 10 },
+            "BF": { name: "Burkina Faso", dial: "+226", devise: "FCFA", rate: 0.0714, format: "70 00 00 00", length: 8 },
+            "GW": { name: "Guinée-Bissau", dial: "+245", devise: "FCFA", rate: 0.0714, format: "955 000 000", length: 9 },
+            "NE": { name: "Niger", dial: "+227", devise: "FCFA", rate: 0.0714, format: "90 00 00 00", length: 8 },
+            "TG": { name: "Togo", dial: "+228", devise: "FCFA", rate: 0.0714, format: "90 00 00 00", length: 8 },
+
+            // Europe / Amérique
+            "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.000125, format: "06 00 00 00 00", length: 10 },
+            "DE": { name: "Allemagne", dial: "+49", devise: "EUR", rate: 0.000125, format: "015 000 000 00", length: 11 },
+            "ES": { name: "Espagne", dial: "+34", devise: "EUR", rate: 0.000125, format: "600 000 000", length: 9 },
+            "US": { name: "États-Unis", dial: "+1", devise: "USD", rate: 0.000125, format: "(555) 000-0000", length: 10 },
+            "CA": { name: "Canada", dial: "+1", devise: "CAD", rate: 0.000125, format: "000-000-0000", length: 10 },
+            "GB": { name: "Royaume-Uni", dial: "+44", devise: "GBP", rate: 0.000125, format: "07000 000000", length: 11 }
         };
 
         if (config[countryCode]) {
@@ -503,10 +549,13 @@
         const numero = document.getElementById('telephone').value;
         const fullPhoneNumber = indicatif + " " + numero;
 
+        // Calcul du prix final exact pour Shopify
+        const finalPrice = roundSmartPrice(price * conversionRate, detectedDevise);
+
         const data = {
             produit: productData.name,
             quantite: currentBundle,
-            prix_total: Math.round(price * conversionRate),
+            prix_total: finalPrice,
             devise: detectedDevise,
             prenom: document.getElementById('prenom').value,
             nom: document.getElementById('nom').value,
