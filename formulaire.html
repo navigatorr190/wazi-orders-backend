@@ -7,7 +7,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        /* FOND BLEU CONSERVÉ */
         body { 
             font-family: 'Inter', sans-serif; 
             background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
@@ -15,51 +14,41 @@
             padding: 0; 
             color: #0f172a; 
             line-height: 1.5; 
-            padding-bottom: 20px;
             width: 100%;
             overflow-x: hidden; 
         }
         
-        .container { 
-            max-width: 480px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            box-sizing: border-box; 
-            width: 100%;
-        }
+        .container { max-width: 480px; margin: 0 auto; padding: 15px; box-sizing: border-box; width: 100%; }
         
-        /* BANDEAU HAUT */
         .top-banner { 
             background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
             color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; 
-            margin-bottom: 20px; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); 
+            margin-bottom: 15px; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); 
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .top-banner svg { width: 18px; height: 18px; fill: white; flex-shrink: 0; }
 
-        .product-summary { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #bae6fd; border-radius: 12px; margin-bottom: 20px; background: white; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1); }
+        .product-summary { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #bae6fd; border-radius: 12px; margin-bottom: 15px; background: white; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1); }
         .product-img-small { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; background: #f1f5f9; flex-shrink: 0; }
         .product-details { flex-grow: 1; min-width: 0; } 
         .product-name { font-weight: 700; font-size: 16px; margin: 0 0 5px 0; color: #0f172a; word-wrap: break-word; } 
         .product-variant { font-size: 13px; color: #64748b; margin: 0; }
         
-        /* BADGE LIVRAISON GRATUITE */
         .free-shipping-badge { 
             background: #22c55e; color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; 
             display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; text-transform: uppercase; box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3); 
         }
         .free-shipping-badge svg { width: 12px; height: 12px; fill: white; }
 
-        /* --- ANIMATIONS DES BLOCS BUNDLES --- */
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .bundle-grid { display: grid; gap: 15px; margin-bottom: 25px; }
+        .bundle-grid { display: grid; gap: 12px; margin-bottom: 20px; }
         
         .bundle-card { 
-            border: 2px solid #e2e8f0; border-radius: 12px; padding: 18px 15px; cursor: pointer; 
+            border: 2px solid #e2e8f0; border-radius: 12px; padding: 15px; cursor: pointer; 
             display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; 
             position: relative; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.02);
             animation: slideUp 0.5s ease forwards; opacity: 0; 
@@ -70,7 +59,6 @@
         .bundle-card:nth-child(3) { animation-delay: 0.3s; }
         .bundle-card:active { transform: scale(0.98); }
 
-        /* EFFET DE LUMIÈRE SUR LE BLOC SÉLECTIONNÉ */
         .bundle-card.active { 
             border-color: #38bdf8; background-color: #f0f9ff; transform: translateY(-3px); 
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 10px rgba(56, 189, 248, 0.3), inset 0 0 10px rgba(56, 189, 248, 0.1); 
@@ -87,17 +75,16 @@
         }
 
         .bundle-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; } 
-        .bundle-title { font-weight: 700; font-size: 16px; color: #0f172a; } 
+        .bundle-title { font-weight: 700; font-size: 15px; color: #0f172a; } 
         
-        /* PRIX BARRÉ ET POURCENTAGE */
         .bundle-price-container { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .bundle-old-price { font-size: 13px; color: #94a3b8; text-decoration: line-through; }
         .bundle-saving-badge { font-size: 11px; color: #ef4444; font-weight: 700; background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
         
-        .bundle-price-tag { font-weight: 800; font-size: 18px; color: #0284c7; white-space: nowrap; }
+        .bundle-price-tag { font-weight: 800; font-size: 17px; color: #0284c7; white-space: nowrap; }
         
-        .form-group { margin-bottom: 15px; } .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
-        .form-group input { width: 100%; padding: 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; background-color: #f8fafc; transition: all 0.2s; }
+        .form-group { margin-bottom: 12px; } .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #334155; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; background-color: #f8fafc; transition: all 0.2s; }
         .form-group input:focus { outline: none; border-color: #38bdf8; background-color: #fff; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
         
         .form-group input.error { border-color: #ef4444; background-color: #fef2f2; }
@@ -105,7 +92,7 @@
 
         .form-row { display: flex; gap: 10px; flex-wrap: wrap; } .form-row .form-group { flex: 1; min-width: 140px; }
         .phone-input-group { display: flex; gap: 8px; }
-        .indicatif-box { width: 80px; text-align: center; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px 0; color: #0f172a; flex-shrink: 0; }
+        .indicatif-box { width: 75px; text-align: center; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 0; color: #0f172a; flex-shrink: 0; }
         .phone-input-group input { flex: 1; min-width: 0; }
 
         .delivery-info { 
@@ -115,34 +102,33 @@
         .delivery-info svg { width: 16px; height: 16px; fill: #22c55e; flex-shrink: 0; }
         .delivery-info span { color: #22c55e; font-weight: 700; }
 
-        /* --- BOUTON COMMANDER PRINCIPAL --- */
         @keyframes zoomInOut { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
 
         .btn-order { 
-            width: 100%; padding: 15px 18px; 
+            width: 100%; padding: 14px 15px; 
             background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
             color: #ffffff; border: none; border-radius: 8px; font-weight: 700; 
-            cursor: pointer; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; margin-top: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4); 
             animation: zoomInOut 2s infinite ease-in-out; 
             transition: box-shadow 0.2s, background 0.2s;
             gap: 4px;
         }
         
-        .btn-main-text { font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
-        .btn-sub-text { font-size: 14px; font-weight: 500; background: rgba(0,0,0,0.1); padding: 2px 10px; border-radius: 4px; }
+        .btn-main-text { font-size: 17px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .btn-sub-text { font-size: 13px; font-weight: 500; background: rgba(0,0,0,0.1); padding: 2px 10px; border-radius: 4px; }
 
         .btn-order:active { transform: scale(0.96); animation: none; } 
         .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; animation: none; }
         
-        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 12px; color: #64748b; font-weight: 500; } 
+        .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 12px; color: #64748b; font-weight: 500; } 
         .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; flex-shrink: 0; }
 
-        /* --- BOUTON FIXE EN BAS DE L'ÉCRAN (STICKY) --- */
+        /* --- BOUTON FIXE (STICKY) --- */
         .sticky-bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-            padding: 12px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 10px 15px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
             display: flex; justify-content: center; z-index: 1500;
             transform: translateY(100%); transition: transform 0.3s ease;
             box-sizing: border-box;
@@ -152,21 +138,22 @@
         .sticky-btn {
             width: 100%; max-width: 440px;
             background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
-            color: white; border: none; padding: 15px; border-radius: 8px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
+            color: white; border: none; padding: 12px; border-radius: 8px;
+            font-size: 15px; font-weight: 700; cursor: pointer;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
         }
 
-        /* --- POP-UP D'ENGAGEMENT (BLEU) --- */
+        /* --- POP-UP D'ENGAGEMENT (CENTRÉ ET FIXE) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.65); display: none; justify-content: center; align-items: center;
-            z-index: 2000; padding: 20px; box-sizing: border-box; backdrop-filter: blur(3px);
+            background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center;
+            z-index: 9999; padding: 15px; box-sizing: border-box; backdrop-filter: blur(4px);
+            /* Le pop-up est fixé par rapport à l'écran, pas à l'iframe */
         }
         .modal-content {
-            background: #ffffff; padding: 30px 25px; border-radius: 16px; text-align: left; max-width: 400px; width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15); animation: popIn 0.35s ease-out;
+            background: #ffffff; padding: 25px 20px; border-radius: 16px; text-align: left; max-width: 380px; width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.35s ease-out;
             position: relative; overflow: hidden;
         }
         .modal-content::before {
@@ -176,37 +163,37 @@
         @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         
         .modal-icon-info { 
-            width: 60px; height: 60px; background: #e0f2fe; border-radius: 50%; 
+            width: 50px; height: 50px; background: #e0f2fe; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            margin: 0 auto 15px auto; border: 2px solid #bae6fd; 
+            margin: 0 auto 12px auto; border: 2px solid #bae6fd; 
         }
-        .modal-icon-info svg { width: 32px; height: 32px; fill: #0284c7; }
+        .modal-icon-info svg { width: 28px; height: 28px; fill: #0284c7; }
         
-        .modal-title { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0 0 12px 0; text-align: center; }
+        .modal-title { font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 10px 0; text-align: center; }
         .modal-text { 
-            font-size: 14px; color: #475569; margin-bottom: 25px; line-height: 1.6; text-align: center;
-            background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;
+            font-size: 13px; color: #475569; margin-bottom: 20px; line-height: 1.5; text-align: center;
+            background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;
         }
         .modal-text strong { color: #e11d48; font-weight: 600; }
 
-        .modal-buttons { display: flex; gap: 12px; }
+        .modal-buttons { display: flex; gap: 10px; }
         .modal-btn-cancel {
-            flex: 1; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 14px; border-radius: 10px;
-            font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+            flex: 1; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
         }
         .modal-btn-cancel:hover { background: #f1f5f9; }
         .modal-btn-confirm {
-            flex: 1; background: #10b981; color: white; border: none; padding: 14px; border-radius: 10px;
-            font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s, opacity 0.2s;
+            flex: 1; background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, opacity 0.2s;
             display: flex; justify-content: center; align-items: center; gap: 6px;
         }
         .modal-btn-confirm:hover { background: #059669; }
         .modal-btn-confirm:disabled { background: #e2e8f0; color: #94a3b8; cursor: wait; }
 
         /* --- POP-UP DE SUCCÈS --- */
-        .modal-icon-success { width: 60px; height: 60px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; border: 2px solid #a7f3d0; }
-        .modal-icon-success svg { width: 32px; height: 32px; fill: #10b981; }
-        .modal-btn-close { width: 100%; background: #1e293b; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .modal-icon-success { width: 50px; height: 50px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 2px solid #a7f3d0; }
+        .modal-icon-success svg { width: 28px; height: 28px; fill: #10b981; }
+        .modal-btn-close { width: 100%; background: #1e293b; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -231,7 +218,7 @@
 
     <div class="bundle-grid" id="bundle-container"></div>
 
-    <form id="codForm" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1);">
+    <form id="codForm" style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.1);">
         <div class="form-row">
             <div class="form-group"><label>Prénom *</label><input type="text" id="prenom" required placeholder="Mamadou"></div>
             <div class="form-group"><label>Nom *</label><input type="text" id="nom" required placeholder="Diallo"></div>
