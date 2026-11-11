@@ -4,26 +4,21 @@ const axios = require('axios');
 const path = require('path');
 const app = express();
 
-// Configuration pour lire les données JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Autoriser les appels (CORS)
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
-// Afficher les fichiers statiques (comme formulaire.html)
 app.use(express.static(path.join(__dirname)));
 
-// Route racine : Affiche un message simple
 app.get('/', (req, res) => {
     res.send('Le serveur WAZI ORDERS est en ligne.');
 });
 
-// Route pour recevoir la commande du formulaire
 app.post('/commande', async (req, res) => {
     const { produit, quantite, prix_total, devise, prenom, nom, telephone, pays, adresse } = req.body;
     
@@ -31,6 +26,8 @@ app.post('/commande', async (req, res) => {
     console.log(`Client : ${prenom} ${nom} (${telephone})`);
     console.log(`Produit : ${produit} x${quantite}`);
     console.log(`Prix : ${prix_total} ${devise}`);
+    console.log(`Pays détecté : ${pays}`);
+    console.log(`Adresse : ${adresse}`);
 
     try {
         const shopUrl = process.env.SHOPIFY_STORE_URL;
@@ -41,8 +38,7 @@ app.post('/commande', async (req, res) => {
             throw new Error("Variables d'environnement manquantes sur Render.");
         }
 
-        // --- ÉTAPE 1 : OBTENIR LE TOKEN D'ACCÈS SHOPIFY ---
-        console.log("Demande d'un nouveau token d'accès à Shopify...");
+        // 1. OBTENIR LE TOKEN
         const tokenResponse = await axios.post(
             `https://${shopUrl}/admin/oauth/access_token`,
             new URLSearchParams({
@@ -54,28 +50,41 @@ app.post('/commande', async (req, res) => {
         );
 
         const accessToken = tokenResponse.data.access_token;
-        console.log("Token obtenu avec succès !");
 
-        // Nettoyer le numéro de téléphone (enlever tout sauf les chiffres et le +)
+        // Nettoyer le numéro
         const cleanPhone = telephone.replace(/[^\d+]/g, '');
 
-        // --- ÉTAPE 2 : CHERCHER SI LE CLIENT EXISTE DÉJÀ ---
-        console.log("Recherche du client par téléphone...");
-        const customerSearchUrl = `https://${shopUrl}/admin/api/2024-01/customers/search.json?query=phone:${encodeURIComponent(cleanPhone)}`;
-        
-        const searchResponse = await axios.get(customerSearchUrl, {
-            headers: { 'X-Shopify-Access-Token': accessToken }
-        });
+        // 2. CONVERSION DU PAYS EN CODE ISO (Obligatoire pour Shopify)
+        // Si le pays n'est pas dans la liste, on met 'GN' par défaut
+        const countryCodes = {
+            "Guinée": "GN",
+            "Sénégal": "SN",
+            "Côte d'Ivoire": "CI",
+            "Mali": "ML",
+            "France": "FR",
+            "Allemagne": "DE",
+            "États-Unis": "US",
+            "Canada": "CA",
+            "Royaume-Uni": "GB"
+        };
+        const countryIso = countryCodes[pays] || "GN";
 
+        // 3. CHERCHER LE CLIENT
         let customerId = null;
-        if (searchResponse.data.customers && searchResponse.data.customers.length > 0) {
-            customerId = searchResponse.data.customers[0].id;
-            console.log(`Client trouvé (ID: ${customerId}). La commande sera associée à ce client.`);
-        } else {
-            console.log("Aucun client trouvé. Un nouveau client sera créé.");
+        try {
+            const customerSearchUrl = `https://${shopUrl}/admin/api/2024-01/customers/search.json?query=phone:${encodeURIComponent(cleanPhone)}`;
+            const searchResponse = await axios.get(customerSearchUrl, {
+                headers: { 'X-Shopify-Access-Token': accessToken }
+            });
+
+            if (searchResponse.data.customers && searchResponse.data.customers.length > 0) {
+                customerId = searchResponse.data.customers[0].id;
+            }
+        } catch (err) {
+            console.log("Recherche client ignorée (nouveau client).");
         }
 
-        // --- ÉTAPE 3 : CRÉER LA COMMANDE ---
+        // 4. CRÉER LA COMMANDE AVEC TOUTES LES INFOS
         const shopifyOrderData = {
             order: {
                 line_items: [{
@@ -83,6 +92,7 @@ app.post('/commande', async (req, res) => {
                     quantity: parseInt(quantite),
                     price: parseFloat(prix_total).toString()
                 }],
+                // Informations du client (Nom + Téléphone)
                 ...(customerId ? { customer: { id: customerId } } : { 
                     customer: {
                         first_name: prenom,
@@ -90,17 +100,30 @@ app.post('/commande', async (req, res) => {
                         phone: cleanPhone
                     }
                 }),
+                // Adresse de livraison complète
                 shipping_address: {
                     first_name: prenom,
                     last_name: nom,
                     address1: adresse,
                     phone: cleanPhone,
-                    country: pays
+                    country_code: countryIso, // CODE ISO OBLIGATOIRE
+                    country_name: pays
+                },
+                // Informations de facturation (parfois nécessaire pour l'affichage)
+                billing_address: {
+                    first_name: prenom,
+                    last_name: nom,
+                    address1: adresse,
+                    phone: cleanPhone,
+                    country_code: countryIso,
+                    country_name: pays
                 },
                 financial_status: "pending",
-                tags: "WAZI COD",
-                note: `Commande via formulaire COD. Devise : ${devise}.`,
-                currency: devise === "GNF" ? "GNF" : "XOF"
+                tags: `WAZI COD, Pays: ${pays}, Devise: ${devise}`,
+                // La note contient tout ce qu'il faut pour le livreur
+                note: `📍 Pays : ${pays}\n🏠 Adresse : ${adresse}\n📞 Tél : ${telephone}\n💰 Montant : ${prix_total} ${devise}`,
+                currency: devise === "GNF" ? "GNF" : "XOF",
+                inventory_behaviour: "bypass"
             }
         };
 
@@ -114,20 +137,19 @@ app.post('/commande', async (req, res) => {
         });
 
         console.log("✅ Commande créée avec succès dans Shopify ! ID:", response.data.order.id);
-        res.status(200).json({ success: true, message: "Commande enregistrée dans Shopify !" });
+        res.status(200).json({ success: true, message: "Commande enregistrée !" });
 
     } catch (error) {
-        console.error("❌ Erreur lors de la création de la commande Shopify :");
+        console.error("❌ Erreur Shopify :");
         if (error.response) {
-            console.error("Détails de l'erreur Shopify :", error.response.data);
+            console.error(error.response.data);
         } else {
-            console.error("Message d'erreur :", error.message);
+            console.error(error.message);
         }
-        res.status(500).json({ success: false, message: "Erreur lors de la création de la commande." });
+        res.status(500).json({ success: false, message: "Erreur lors de la création." });
     }
 });
 
-// --- LE DÉMARRAGE DU SERVEUR (CORRIGÉ POUR RENDER) ---
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
