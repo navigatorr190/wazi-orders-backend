@@ -6,7 +6,7 @@
     <title>Commander - WAZI STORE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); margin: 0; padding: 0; color: #0f172a; line-height: 1.5; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); margin: 0; padding: 0; color: #0f172a; line-height: 1.5; min-height: 100vh; padding-bottom: 90px; }
         .container { max-width: 480px; margin: 0 auto; padding: 20px; }
         
         /* BANDEAU HAUT */
@@ -68,7 +68,6 @@
         }
 
         .bundle-info { display: flex; flex-direction: column; gap: 2px; } 
-        /* TITRE DU BUNDLE MIS A JOUR */
         .bundle-title { font-weight: 700; font-size: 16px; color: #0f172a; } 
         
         /* PRIX BARRÉ ET POURCENTAGE */
@@ -98,24 +97,80 @@
         .delivery-info svg { width: 16px; height: 16px; fill: #22c55e; }
         .delivery-info span { color: #22c55e; font-weight: 700; }
 
-        /* --- ANIMATION DE ZOOM SUR LE BOUTON COMMANDER --- */
+        /* --- BOUTON COMMANDER PRINCIPAL --- */
         @keyframes zoomInOut { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
 
         .btn-order { 
-            width: 100%; padding: 18px; background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
-            color: #ffffff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; 
-            cursor: pointer; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; 
+            width: 100%; padding: 15px 18px; 
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
+            color: #ffffff; border: none; border-radius: 8px; font-weight: 700; 
+            cursor: pointer; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4); 
             animation: zoomInOut 2s infinite ease-in-out; 
             transition: box-shadow 0.2s, background 0.2s;
+            gap: 4px;
         }
+        
+        .btn-main-text { font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-sub-text { font-size: 14px; font-weight: 500; background: rgba(0,0,0,0.1); padding: 2px 10px; border-radius: 4px; }
+
         .btn-order:active { transform: scale(0.96); animation: none; } 
         .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; animation: none; }
         
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; font-size: 12px; color: #64748b; font-weight: 500; } 
         .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; }
+
+        /* --- BOUTON FIXE EN BAS DE L'ÉCRAN (STICKY) --- */
+        .sticky-bottom-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            z-index: 1500;
+            transform: translateY(100%); /* Caché par défaut */
+            transition: transform 0.3s ease;
+        }
+        .sticky-bottom-bar.visible {
+            transform: translateY(0);
+        }
         
-        .toast { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #0f172a; color: white; padding: 15px; border-radius: 8px; font-weight: 500; text-align: center; display: none; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .sticky-btn {
+            width: 100%;
+            max-width: 440px;
+            background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        /* --- POP-UP DE CONFIRMATION --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center;
+            z-index: 2000; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: white; padding: 30px 20px; border-radius: 16px; text-align: center; max-width: 400px; width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .modal-icon { width: 70px; height: 70px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; }
+        .modal-icon svg { width: 40px; height: 40px; fill: #22c55e; }
+        .modal-title { font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 10px 0; }
+        .modal-text { font-size: 15px; color: #475569; margin-bottom: 20px; line-height: 1.4; }
+        .modal-btn { background: #0f172a; color: white; border: none; padding: 14px 20px; border-radius: 8px; font-size: 16px; font-weight: 600; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -163,8 +218,8 @@
         </div>
 
         <button type="submit" class="btn-order" id="btn-submit">
-            <span id="btn-text">Commander maintenant</span>
-            <span id="btn-price">--- GNF</span>
+            <span class="btn-main-text">Cliquez ici pour commander</span>
+            <span class="btn-sub-text" id="btn-subtitle">1 Unité • --- GNF</span>
         </button>
     </form>
 
@@ -174,7 +229,25 @@
     </div>
 </div>
 
-<div class="toast" id="toast">✅ Commande reçue ! Nous vous appelons sous peu.</div>
+<!-- BOUTON FIXE EN BAS DE L'ECRAN -->
+<div class="sticky-bottom-bar" id="stickyBar">
+    <button class="sticky-btn" onclick="scrollToForm()">
+        <span>Remplir mes infos de livraison</span>
+        <span id="sticky-price">--- GNF</span>
+    </button>
+</div>
+
+<!-- POP-UP DE CONFIRMATION -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+        <div class="modal-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h2 class="modal-title">Commande Validée !</h2>
+        <p class="modal-text">Merci pour votre confiance. Un agent vous appellera dans les plus brefs délais pour confirmer votre livraison.</p>
+        <button class="modal-btn" onclick="closeModal()">Fermer</button>
+    </div>
+</div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -219,7 +292,6 @@
         const percent2 = Math.round((saving2 / totalBase2) * 100);
         const percent3 = Math.round((saving3 / totalBase3) * 100);
 
-        // NOUVEAUX TITRES "ACHETEZ..."
         const bundles = [
             { qty: 1, price: finalPrice1, oldPrice: null, percent: null, label: "Achetez 1 unité", badge: null },
             { qty: 2, price: finalPrice2, oldPrice: totalBase2, percent: percent2, label: "Achetez 2 unités", badge: "Populaire" },
@@ -251,22 +323,20 @@
 
     function updateButtonPrice() {
         let price = productData.basePrice;
-        let btnText = "Commander maintenant";
+        let qtyText = "1 Unité";
         
         if (currentBundle === 2) { 
             price = PRICE_2; 
-            btnText = "Achetez 2 unités"; 
+            qtyText = "2 Unités"; 
         }
         if (currentBundle === 3) { 
             price = PRICE_3; 
-            btnText = "Achetez 3 unités"; 
-        }
-        if (currentBundle === 1) {
-            btnText = "Achetez 1 unité";
+            qtyText = "3 Unités"; 
         }
 
-        document.getElementById('btn-text').innerText = btnText;
-        document.getElementById('btn-price').innerText = formatPrice(price * conversionRate, detectedDevise);
+        const formattedPrice = formatPrice(price * conversionRate, detectedDevise);
+        document.getElementById('btn-subtitle').innerText = `${qtyText} • ${formattedPrice}`;
+        document.getElementById('sticky-price').innerText = formattedPrice;
     }
 
     function applyCountry(countryCode, countryName) {
@@ -328,6 +398,44 @@
         applyCountry("GN", "Guinée");
     }
 
+    // --- LOGIQUE DU BOUTON FIXE (STICKY) ---
+    window.addEventListener('scroll', () => {
+        const stickyBar = document.getElementById('stickyBar');
+        const form = document.getElementById('codForm');
+        
+        // On récupère la position du formulaire par rapport à l'écran
+        const formRect = form.getBoundingClientRect();
+        
+        // Si le HAUT du formulaire est visible à l'écran (formRect.top < window.innerHeight)
+        // ET que le BAS du formulaire n'est pas encore passé au-dessus de l'écran (formRect.bottom > 0)
+        // Cela signifie qu'on voit le formulaire : ON CACHE LE BOUTON.
+        // Sinon (on est en haut sur le produit ou tout en bas) : ON AFFICHE LE BOUTON.
+        
+        const isFormVisible = (formRect.top < window.innerHeight) && (formRect.bottom > 100); 
+        
+        if (isFormVisible) {
+            stickyBar.classList.remove('visible');
+        } else {
+            stickyBar.classList.add('visible');
+        }
+    });
+
+    // FONCTION POUR SCROLLER VERS LE FORMULAIRE
+    function scrollToForm() {
+        const form = document.getElementById('codForm');
+        // On fait défiler jusqu'au formulaire
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Et on met le focus sur le prénom après le défilement
+        setTimeout(() => {
+            document.getElementById('prenom').focus();
+        }, 600); 
+    }
+
+    function closeModal() {
+        document.getElementById('successModal').style.display = 'none';
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         detectCountry(); 
         
@@ -344,6 +452,9 @@
                 errorMsg.style.display = 'none';
             }
         });
+
+        // Déclencher le scroll au chargement pour ajuster l'état du bouton sticky
+        window.dispatchEvent(new Event('scroll'));
     });
 
     document.getElementById('codForm').addEventListener('submit', async function(e) {
@@ -357,7 +468,7 @@
 
         const btn = document.getElementById('btn-submit');
         btn.disabled = true;
-        btn.innerHTML = `<span>Traitement...</span>`;
+        btn.innerHTML = `<span class="btn-main-text">Traitement...</span>`;
 
         let price = productData.basePrice;
         if (currentBundle === 2) price = PRICE_2;
@@ -387,24 +498,23 @@
             });
 
             if(response.ok) {
-                const toast = document.getElementById('toast');
-                toast.style.display = 'block';
+                document.getElementById('successModal').style.display = 'flex';
                 document.getElementById('codForm').reset();
                 currentBundle = 1;
                 renderBundles();
-                setTimeout(() => { toast.style.display = 'none'; }, 4000);
+                
                 btn.disabled = false;
-                btn.innerHTML = `<span id="btn-text">Achetez 1 unité</span><span id="btn-price"></span>`;
+                btn.innerHTML = `<span class="btn-main-text">Cliquez ici pour commander</span><span class="btn-sub-text" id="btn-subtitle"></span>`;
                 updateButtonPrice();
             } else {
                 alert('Erreur lors de l\'envoi. Veuillez réessayer.');
                 btn.disabled = false;
-                btn.innerHTML = `<span>Réessayer</span>`;
+                btn.innerHTML = `<span class="btn-main-text">Réessayer</span>`;
             }
         } catch (error) {
             alert('Erreur de connexion au serveur.');
             btn.disabled = false;
-            btn.innerHTML = `<span>Réessayer</span>`;
+            btn.innerHTML = `<span class="btn-main-text">Réessayer</span>`;
         }
     });
 </script>
