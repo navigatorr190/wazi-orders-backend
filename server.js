@@ -50,12 +50,16 @@ app.post('/commande', async (req, res) => {
         const accessToken = tokenResponse.data.access_token;
         const cleanPhone = telephone.replace(/[^\d+]/g, '');
 
-        // --- CORRECTION ICI : ON ENVOIE LE PRIX UNITAIRE EXACT ---
-        // Shopify calcule : prix unitaire * quantité = total
-        // Donc on divise le prix_total par la quantité pour que le total final soit correct
+        // Définition des codes de devise pour Shopify
+        let currencyCode = "GNF";
+        if (devise === "XOF" || devise === "FCFA") currencyCode = "XOF";
+        else if (devise === "EUR") currencyCode = "EUR";
+        else if (devise === "USD") currencyCode = "USD";
+        else if (devise === "GBP") currencyCode = "GBP";
+        else if (devise === "CAD") currencyCode = "CAD";
+
+        // Prix unitaire (pour Shopify)
         const pricePerItem = parseFloat(prix_total) / parseInt(quantite);
-        
-        console.log(`Prix unitaire calculé pour Shopify : ${pricePerItem} ${devise}`);
 
         const countryCodes = {
             "Guinée": "GN", "Sénégal": "SN", "Côte d'Ivoire": "CI", "Mali": "ML",
@@ -77,14 +81,40 @@ app.post('/commande', async (req, res) => {
             }
         } catch (err) {}
 
+        // --- CORRECTION ICI : GESTION DE LA DEVISE ET DU MONTANT ---
+        // On calcule le montant en GNF pour la note (basé sur les taux que vous avez donnés)
+        // 1 XOF = 14 GNF, 1 EUR/USD = 8000 GNF
+        let priceInGNF = prix_total;
+        if (currencyCode === "XOF") priceInGNF = prix_total * 14;
+        else if (["EUR", "USD", "GBP", "CAD"].includes(currencyCode)) priceInGNF = prix_total * 8000;
+
+        // Symbole de la devise
+        let symbol = "";
+        if (currencyCode === "USD" || currencyCode === "CAD") symbol = "$";
+        else if (currencyCode === "EUR") symbol = "€";
+        else if (currencyCode === "GBP") symbol = "£";
+        else if (currencyCode === "XOF") symbol = "FCFA";
+        else symbol = "GNF";
+
+        const noteText = `📍 Pays : ${pays}\n🏠 Adresse : ${adresse}\n📞 Tél : ${telephone}\n💰 Montant client : ${prix_total} ${symbol} (${currencyCode})\n🔄 Équivalent GNF : ${Math.round(priceInGNF).toLocaleString('fr-FR')} GNF`;
+
         const shopifyOrderData = {
             order: {
                 line_items: [{
                     title: produit,
                     quantity: parseInt(quantite),
-                    price: pricePerItem.toString(), // Prix unitaire
-                    // On force le prix total exact de la ligne
-                    total_discount: "0.00" 
+                    price: pricePerItem.toString(),
+                    // ON FORCE LA DEVISE ICI POUR QUE SHOPIFY COMPRENNE
+                    price_set: {
+                        shop_money: {
+                            amount: pricePerItem.toString(),
+                            currency_code: "GNF" // Shopify convertira automatiquement
+                        },
+                        presentment_money: {
+                            amount: pricePerItem.toString(),
+                            currency_code: currencyCode // La devise réelle du client
+                        }
+                    }
                 }],
                 ...(customerId ? { customer: { id: customerId } } : { 
                     customer: {
@@ -110,9 +140,10 @@ app.post('/commande', async (req, res) => {
                     country_name: pays
                 },
                 financial_status: "pending",
-                tags: `WAZI COD, Pays: ${pays}, Devise: ${devise}`,
-                note: `📍 Pays : ${pays}\n🏠 Adresse : ${adresse}\n📞 Tél : ${telephone}\n💰 Montant total : ${prix_total} ${devise}`,
-                currency: devise === "GNF" ? "GNF" : "XOF",
+                tags: `WAZI COD, Pays: ${pays}, Devise: ${currencyCode}`,
+                note: noteText,
+                // On force la devise de la commande
+                currency: currencyCode,
                 inventory_behaviour: "bypass"
             }
         };
@@ -127,6 +158,7 @@ app.post('/commande', async (req, res) => {
         });
 
         console.log("✅ Commande créée avec succès dans Shopify ! ID:", response.data.order.id);
+        console.log(`Montant : ${prix_total} ${currencyCode} (${Math.round(priceInGNF)} GNF)`);
         res.status(200).json({ success: true, message: "Commande enregistrée !" });
 
     } catch (error) {
