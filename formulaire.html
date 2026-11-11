@@ -310,20 +310,24 @@
     let conversionRate = 1; 
     let currentPhoneLength = 9; 
 
-    const PRICE_2 = productData.basePrice * 2 - 25000;
-    const PRICE_3 = productData.basePrice * 3 - 37500;
+    // RÉDUCTIONS : 2 unités = -20 000 GNF, 3 unités = -30 000 GNF
+    const PRICE_2 = productData.basePrice * 2 - 20000;
+    const PRICE_3 = productData.basePrice * 3 - 30000;
     let currentBundle = 1;
-    let currentFinalPrice = productData.basePrice; // Prix final calculé pour l'envoi
+    let currentFinalPrice = productData.basePrice;
 
     function roundSmartPrice(price, devise) {
         if (devise === "FCFA") {
+            // FCFA : Arrondir au multiple de 500 supérieur
             return Math.ceil(price / 500) * 500;
         } else if (devise === "EUR" || devise === "USD" || devise === "GBP" || devise === "CAD") {
+            // EUR/USD : Règle du 0.50
             let integerPart = Math.floor(price);
             let decimalPart = price - integerPart;
             if (decimalPart < 0.50) { return integerPart; } 
             else { return integerPart + 0.99; }
         } else {
+            // GNF : arrondir à l'unité
             return Math.round(price);
         }
     }
@@ -338,9 +342,6 @@
     function renderBundles() {
         const container = document.getElementById('bundle-container');
         
-        const saving2 = Math.round(25000 * conversionRate);
-        const saving3 = Math.round(37500 * conversionRate);
-        
         const totalBase1 = productData.basePrice * conversionRate;
         const totalBase2 = (productData.basePrice * 2) * conversionRate;
         const totalBase3 = (productData.basePrice * 3) * conversionRate;
@@ -349,7 +350,6 @@
         const finalPrice2 = roundSmartPrice(PRICE_2 * conversionRate, detectedDevise);
         const finalPrice3 = roundSmartPrice(PRICE_3 * conversionRate, detectedDevise);
         
-        const oldPrice1 = null;
         const oldPrice2 = roundSmartPrice(totalBase2, detectedDevise);
         const oldPrice3 = roundSmartPrice(totalBase3, detectedDevise);
 
@@ -376,7 +376,6 @@
             </div>
         `).join('');
         
-        // Mettre à jour le prix du bundle actif
         const activeBundle = bundles.find(b => b.qty === currentBundle);
         if (activeBundle) {
             currentFinalPrice = activeBundle.price;
@@ -387,7 +386,7 @@
 
     function selectBundle(qty, element, price) {
         currentBundle = qty;
-        currentFinalPrice = price; // On stocke le prix final
+        currentFinalPrice = price;
         document.querySelectorAll('.bundle-card').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
         updateButtonPrice();
@@ -532,11 +531,10 @@
         const numero = document.getElementById('telephone').value;
         const fullPhoneNumber = indicatif + " " + numero;
 
-        // On envoie exactement le prix final calculé et affiché
         const data = {
             produit: productData.name,
             quantite: currentBundle,
-            prix_total: currentFinalPrice, // ← C'est le prix corrigé !
+            prix_total: currentFinalPrice,
             devise: detectedDevise,
             prenom: document.getElementById('prenom').value,
             nom: document.getElementById('nom').value,
@@ -545,7 +543,7 @@
             adresse: document.getElementById('adresse').value
         };
 
-        console.log("Envoi de la commande :", data); // Pour vérifier dans les logs
+        console.log("Envoi de la commande :", data);
 
         try {
             const response = await fetch('https://wazi-orders-backend.onrender.com/commande', {
