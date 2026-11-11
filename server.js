@@ -25,9 +25,8 @@ app.post('/commande', async (req, res) => {
     console.log("=== NOUVELLE COMMANDE REÇUE ===");
     console.log(`Client : ${prenom} ${nom} (${telephone})`);
     console.log(`Produit : ${produit} x${quantite}`);
-    console.log(`Prix : ${prix_total} ${devise}`);
+    console.log(`Prix total : ${prix_total} ${devise}`);
     console.log(`Pays détecté : ${pays}`);
-    console.log(`Adresse : ${adresse}`);
 
     try {
         const shopUrl = process.env.SHOPIFY_STORE_URL;
@@ -38,7 +37,6 @@ app.post('/commande', async (req, res) => {
             throw new Error("Variables d'environnement manquantes sur Render.");
         }
 
-        // 1. OBTENIR LE TOKEN
         const tokenResponse = await axios.post(
             `https://${shopUrl}/admin/oauth/access_token`,
             new URLSearchParams({
@@ -50,26 +48,23 @@ app.post('/commande', async (req, res) => {
         );
 
         const accessToken = tokenResponse.data.access_token;
-
-        // Nettoyer le numéro
         const cleanPhone = telephone.replace(/[^\d+]/g, '');
 
-        // 2. CONVERSION DU PAYS EN CODE ISO (Obligatoire pour Shopify)
-        // Si le pays n'est pas dans la liste, on met 'GN' par défaut
+        // --- CORRECTION ICI : ON ENVOIE LE PRIX UNITAIRE EXACT ---
+        // Shopify calcule : prix unitaire * quantité = total
+        // Donc on divise le prix_total par la quantité pour que le total final soit correct
+        const pricePerItem = parseFloat(prix_total) / parseInt(quantite);
+        
+        console.log(`Prix unitaire calculé pour Shopify : ${pricePerItem} ${devise}`);
+
         const countryCodes = {
-            "Guinée": "GN",
-            "Sénégal": "SN",
-            "Côte d'Ivoire": "CI",
-            "Mali": "ML",
-            "France": "FR",
-            "Allemagne": "DE",
-            "États-Unis": "US",
-            "Canada": "CA",
-            "Royaume-Uni": "GB"
+            "Guinée": "GN", "Sénégal": "SN", "Côte d'Ivoire": "CI", "Mali": "ML",
+            "Bénin": "BJ", "Burkina Faso": "BF", "Guinée-Bissau": "GW", "Niger": "NE", "Togo": "TG",
+            "France": "FR", "Allemagne": "DE", "Espagne": "ES", "États-Unis": "US",
+            "Canada": "CA", "Royaume-Uni": "GB"
         };
         const countryIso = countryCodes[pays] || "GN";
 
-        // 3. CHERCHER LE CLIENT
         let customerId = null;
         try {
             const customerSearchUrl = `https://${shopUrl}/admin/api/2024-01/customers/search.json?query=phone:${encodeURIComponent(cleanPhone)}`;
@@ -80,19 +75,17 @@ app.post('/commande', async (req, res) => {
             if (searchResponse.data.customers && searchResponse.data.customers.length > 0) {
                 customerId = searchResponse.data.customers[0].id;
             }
-        } catch (err) {
-            console.log("Recherche client ignorée (nouveau client).");
-        }
+        } catch (err) {}
 
-        // 4. CRÉER LA COMMANDE AVEC TOUTES LES INFOS
         const shopifyOrderData = {
             order: {
                 line_items: [{
                     title: produit,
                     quantity: parseInt(quantite),
-                    price: parseFloat(prix_total).toString()
+                    price: pricePerItem.toString(), // Prix unitaire
+                    // On force le prix total exact de la ligne
+                    total_discount: "0.00" 
                 }],
-                // Informations du client (Nom + Téléphone)
                 ...(customerId ? { customer: { id: customerId } } : { 
                     customer: {
                         first_name: prenom,
@@ -100,16 +93,14 @@ app.post('/commande', async (req, res) => {
                         phone: cleanPhone
                     }
                 }),
-                // Adresse de livraison complète
                 shipping_address: {
                     first_name: prenom,
                     last_name: nom,
                     address1: adresse,
                     phone: cleanPhone,
-                    country_code: countryIso, // CODE ISO OBLIGATOIRE
+                    country_code: countryIso,
                     country_name: pays
                 },
-                // Informations de facturation (parfois nécessaire pour l'affichage)
                 billing_address: {
                     first_name: prenom,
                     last_name: nom,
@@ -120,8 +111,7 @@ app.post('/commande', async (req, res) => {
                 },
                 financial_status: "pending",
                 tags: `WAZI COD, Pays: ${pays}, Devise: ${devise}`,
-                // La note contient tout ce qu'il faut pour le livreur
-                note: `📍 Pays : ${pays}\n🏠 Adresse : ${adresse}\n📞 Tél : ${telephone}\n💰 Montant : ${prix_total} ${devise}`,
+                note: `📍 Pays : ${pays}\n🏠 Adresse : ${adresse}\n📞 Tél : ${telephone}\n💰 Montant total : ${prix_total} ${devise}`,
                 currency: devise === "GNF" ? "GNF" : "XOF",
                 inventory_behaviour: "bypass"
             }
