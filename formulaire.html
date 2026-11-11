@@ -21,7 +21,6 @@
         
         .container { max-width: 480px; margin: 0 auto; padding: 15px; box-sizing: border-box; width: 100%; }
         
-        /* BANDEAU HAUT */
         .top-banner { 
             background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%); 
             color: white; padding: 12px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: 600; 
@@ -42,7 +41,6 @@
         }
         .free-shipping-badge svg { width: 12px; height: 12px; fill: white; }
 
-        /* --- ANIMATIONS DES BLOCS BUNDLES --- */
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -105,7 +103,6 @@
         .delivery-info svg { width: 16px; height: 16px; fill: #22c55e; flex-shrink: 0; }
         .delivery-info span { color: #22c55e; font-weight: 700; }
 
-        /* --- BOUTON COMMANDER PRINCIPAL --- */
         @keyframes zoomInOut { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
 
         .btn-order { 
@@ -125,7 +122,6 @@
         .btn-order:active { transform: scale(0.96); animation: none; } 
         .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; animation: none; }
 
-        /* CLASSE POUR LE BOUTON SUCCÈS (VERT) */
         .btn-order.success {
             background: #10b981;
             animation: none;
@@ -135,7 +131,6 @@
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 12px; color: #64748b; font-weight: 500; } 
         .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; flex-shrink: 0; }
 
-        /* --- BOUTON FIXE (STICKY) --- */
         .sticky-bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -155,7 +150,6 @@
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
         }
 
-        /* --- POP-UP D'ENGAGEMENT --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center;
@@ -200,7 +194,6 @@
         .modal-btn-confirm:hover { background: #059669; }
         .modal-btn-confirm:disabled { background: #e2e8f0; color: #94a3b8; cursor: wait; }
 
-        /* --- POP-UP DE SUCCÈS --- */
         .modal-icon-success { width: 50px; height: 50px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; border: 2px solid #a7f3d0; }
         .modal-icon-success svg { width: 28px; height: 28px; fill: #10b981; }
         .modal-btn-close { width: 100%; background: #1e293b; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -262,7 +255,6 @@
     </div>
 </div>
 
-<!-- BOUTON FIXE EN BAS DE L'ECRAN -->
 <div class="sticky-bottom-bar" id="stickyBar">
     <button class="sticky-btn" onclick="scrollToForm()">
         <span>Remplir mes infos de livraison</span>
@@ -270,7 +262,6 @@
     </button>
 </div>
 
-<!-- POP-UP 1 : ENGAGEMENT -->
 <div class="modal-overlay" id="engagementModal">
     <div class="modal-content">
         <div class="modal-icon-info">
@@ -290,7 +281,6 @@
     </div>
 </div>
 
-<!-- POP-UP 2 : SUCCÈS -->
 <div class="modal-overlay" id="successModal">
     <div class="modal-content">
         <div class="modal-icon-success">
@@ -320,11 +310,11 @@
     let conversionRate = 1; 
     let currentPhoneLength = 9; 
 
-    const PRICE_2 = productData.basePrice * 2 - 25000; // -25 000 GNF
-    const PRICE_3 = productData.basePrice * 3 - 37500; // -37 500 GNF
+    const PRICE_2 = productData.basePrice * 2 - 25000;
+    const PRICE_3 = productData.basePrice * 3 - 37500;
     let currentBundle = 1;
+    let currentFinalPrice = productData.basePrice; // Prix final calculé pour l'envoi
 
-    // FONCTION D'ARRONDI INTELLIGENT
     function roundSmartPrice(price, devise) {
         if (devise === "FCFA") {
             return Math.ceil(price / 500) * 500;
@@ -373,7 +363,7 @@
         ];
 
         container.innerHTML = bundles.map(b => `
-            <div class="bundle-card ${b.qty === currentBundle ? 'active' : ''}" onclick="selectBundle(${b.qty}, this)">
+            <div class="bundle-card ${b.qty === currentBundle ? 'active' : ''}" onclick="selectBundle(${b.qty}, this, ${b.price})">
                 ${b.badge ? `<div class="bundle-badge">${b.badge}</div>` : ''}
                 <div class="bundle-info">
                     <span class="bundle-title">${b.label}</span>
@@ -385,26 +375,30 @@
                 <div class="bundle-price-tag">${formatPrice(b.price, detectedDevise)}</div>
             </div>
         `).join('');
+        
+        // Mettre à jour le prix du bundle actif
+        const activeBundle = bundles.find(b => b.qty === currentBundle);
+        if (activeBundle) {
+            currentFinalPrice = activeBundle.price;
+        }
+        
         updateButtonPrice();
     }
 
-    function selectBundle(qty, element) {
+    function selectBundle(qty, element, price) {
         currentBundle = qty;
+        currentFinalPrice = price; // On stocke le prix final
         document.querySelectorAll('.bundle-card').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
         updateButtonPrice();
     }
 
     function updateButtonPrice() {
-        let price = productData.basePrice;
         let qtyText = "1 Unité";
-        
-        if (currentBundle === 2) { price = PRICE_2; qtyText = "2 Unités"; }
-        if (currentBundle === 3) { price = PRICE_3; qtyText = "3 Unités"; }
+        if (currentBundle === 2) { qtyText = "2 Unités"; }
+        if (currentBundle === 3) { qtyText = "3 Unités"; }
 
-        const finalPrice = roundSmartPrice(price * conversionRate, detectedDevise);
-        
-        const formattedPrice = formatPrice(finalPrice, detectedDevise);
+        const formattedPrice = formatPrice(currentFinalPrice, detectedDevise);
         document.getElementById('btn-subtitle').innerText = `${qtyText} • ${formattedPrice}`;
         document.getElementById('sticky-price').innerText = formattedPrice;
     }
@@ -534,20 +528,15 @@
         btn.disabled = true;
         btn.innerHTML = `<span class="btn-main-text">Traitement...</span>`;
 
-        let price = productData.basePrice;
-        if (currentBundle === 2) price = PRICE_2;
-        if (currentBundle === 3) price = PRICE_3;
-
         const indicatif = document.getElementById('indicatif').value;
         const numero = document.getElementById('telephone').value;
         const fullPhoneNumber = indicatif + " " + numero;
 
-        const finalPrice = roundSmartPrice(price * conversionRate, detectedDevise);
-
+        // On envoie exactement le prix final calculé et affiché
         const data = {
             produit: productData.name,
             quantite: currentBundle,
-            prix_total: finalPrice,
+            prix_total: currentFinalPrice, // ← C'est le prix corrigé !
             devise: detectedDevise,
             prenom: document.getElementById('prenom').value,
             nom: document.getElementById('nom').value,
@@ -555,6 +544,8 @@
             pays: detectedCountry,
             adresse: document.getElementById('adresse').value
         };
+
+        console.log("Envoi de la commande :", data); // Pour vérifier dans les logs
 
         try {
             const response = await fetch('https://wazi-orders-backend.onrender.com/commande', {
@@ -564,15 +555,11 @@
             });
 
             if(response.ok) {
-                // 1. Afficher le pop-up de succès
                 document.getElementById('successModal').style.display = 'flex';
-                
-                // 2. Vider le formulaire
                 document.getElementById('codForm').reset();
                 currentBundle = 1;
                 renderBundles();
-
-                // 3. Mettre le bouton en mode SUCCÈS (Vert)
+                
                 btn.disabled = true;
                 btn.classList.add('success');
                 btn.innerHTML = `
@@ -580,7 +567,6 @@
                     <span class="btn-sub-text" style="color:white; background:rgba(0,0,0,0.2);">Merci pour votre confiance</span>
                 `;
 
-                // 4. Attendre 10 secondes puis remettre le bouton normal
                 setTimeout(() => {
                     btn.classList.remove('success');
                     btn.disabled = false;
@@ -588,7 +574,7 @@
                         <span class="btn-main-text" id="btn-main-text">Cliquez ici pour commander</span>
                         <span class="btn-sub-text" id="btn-subtitle"></span>
                     `;
-                    updateButtonPrice(); // Remet le prix à jour
+                    updateButtonPrice();
                 }, 10000);
 
             } else {
@@ -624,7 +610,6 @@
         window.dispatchEvent(new Event('scroll'));
     });
 
-    // --- SCRIPT POUR ADAPTER LA HAUTEUR DANS L'IFRAME SHOPIFY ---
     function sendHeight() {
         const height = document.body.scrollHeight;
         window.parent.postMessage({ type: 'resize-wazi-iframe', height: height }, '*');
