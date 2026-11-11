@@ -124,6 +124,13 @@
 
         .btn-order:active { transform: scale(0.96); animation: none; } 
         .btn-order:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; animation: none; }
+
+        /* CLASSE POUR LE BOUTON SUCCÈS (VERT) */
+        .btn-order.success {
+            background: #10b981;
+            animation: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
         
         .secure-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; font-size: 12px; color: #64748b; font-weight: 500; } 
         .secure-badge svg { width: 14px; height: 14px; fill: #22c55e; flex-shrink: 0; }
@@ -244,7 +251,7 @@
         </div>
 
         <button type="submit" class="btn-order" id="btn-submit">
-            <span class="btn-main-text">Cliquez ici pour commander</span>
+            <span class="btn-main-text" id="btn-main-text">Cliquez ici pour commander</span>
             <span class="btn-sub-text" id="btn-subtitle">1 Unité • --- GNF</span>
         </button>
     </form>
@@ -317,23 +324,16 @@
     const PRICE_3 = productData.basePrice * 3 - 37500; // -37 500 GNF
     let currentBundle = 1;
 
-    // NOUVELLE FONCTION D'ARRONDI INTELLIGENT
+    // FONCTION D'ARRONDI INTELLIGENT
     function roundSmartPrice(price, devise) {
         if (devise === "FCFA") {
-            // FCFA : Arrondir au multiple de 500 supérieur
             return Math.ceil(price / 500) * 500;
         } else if (devise === "EUR" || devise === "USD" || devise === "GBP" || devise === "CAD") {
-            // EURO / USD : Règle du 0.50
             let integerPart = Math.floor(price);
             let decimalPart = price - integerPart;
-
-            if (decimalPart < 0.50) {
-                return integerPart; // Vers le bas
-            } else {
-                return integerPart + 0.99; // Vers le haut avec ,99
-            }
+            if (decimalPart < 0.50) { return integerPart; } 
+            else { return integerPart + 0.99; }
         } else {
-            // GNF : arrondir à l'unité
             return Math.round(price);
         }
     }
@@ -355,7 +355,6 @@
         const totalBase2 = (productData.basePrice * 2) * conversionRate;
         const totalBase3 = (productData.basePrice * 3) * conversionRate;
         
-        // APPLICATION DE L'ARRONDI INTELLIGENT
         const finalPrice1 = roundSmartPrice(totalBase1, detectedDevise);
         const finalPrice2 = roundSmartPrice(PRICE_2 * conversionRate, detectedDevise);
         const finalPrice3 = roundSmartPrice(PRICE_3 * conversionRate, detectedDevise);
@@ -364,7 +363,6 @@
         const oldPrice2 = roundSmartPrice(totalBase2, detectedDevise);
         const oldPrice3 = roundSmartPrice(totalBase3, detectedDevise);
 
-        // Calcul du pourcentage réel
         const percent2 = oldPrice2 ? Math.round(((oldPrice2 - finalPrice2) / oldPrice2) * 100) : 0;
         const percent3 = oldPrice3 ? Math.round(((oldPrice3 - finalPrice3) / oldPrice3) * 100) : 0;
 
@@ -413,10 +411,7 @@
 
     function applyCountry(countryCode, countryName) {
         const config = {
-            // Guinée
             "GN": { name: "Guinée", dial: "+224", devise: "GNF", rate: 1, format: "622 00 00 00", length: 9 },
-            
-            // Pays de l'UEMOA (FCFA)
             "SN": { name: "Sénégal", dial: "+221", devise: "FCFA", rate: 0.0714, format: "77 000 00 00", length: 9 },
             "CI": { name: "Côte d'Ivoire", dial: "+225", devise: "FCFA", rate: 0.0714, format: "07 00 00 00 00", length: 10 },
             "ML": { name: "Mali", dial: "+223", devise: "FCFA", rate: 0.0714, format: "70 00 00 00", length: 8 },
@@ -425,8 +420,6 @@
             "GW": { name: "Guinée-Bissau", dial: "+245", devise: "FCFA", rate: 0.0714, format: "955 000 000", length: 9 },
             "NE": { name: "Niger", dial: "+227", devise: "FCFA", rate: 0.0714, format: "90 00 00 00", length: 8 },
             "TG": { name: "Togo", dial: "+228", devise: "FCFA", rate: 0.0714, format: "90 00 00 00", length: 8 },
-
-            // Europe / Amérique
             "FR": { name: "France", dial: "+33", devise: "EUR", rate: 0.000125, format: "06 00 00 00 00", length: 10 },
             "DE": { name: "Allemagne", dial: "+49", devise: "EUR", rate: 0.000125, format: "015 000 000 00", length: 11 },
             "ES": { name: "Espagne", dial: "+34", devise: "EUR", rate: 0.000125, format: "600 000 000", length: 9 },
@@ -549,7 +542,6 @@
         const numero = document.getElementById('telephone').value;
         const fullPhoneNumber = indicatif + " " + numero;
 
-        // Calcul du prix final exact pour Shopify
         const finalPrice = roundSmartPrice(price * conversionRate, detectedDevise);
 
         const data = {
@@ -572,14 +564,33 @@
             });
 
             if(response.ok) {
+                // 1. Afficher le pop-up de succès
                 document.getElementById('successModal').style.display = 'flex';
+                
+                // 2. Vider le formulaire
                 document.getElementById('codForm').reset();
                 currentBundle = 1;
                 renderBundles();
-                
-                btn.disabled = false;
-                btn.innerHTML = `<span class="btn-main-text">Cliquez ici pour commander</span><span class="btn-sub-text" id="btn-subtitle"></span>`;
-                updateButtonPrice();
+
+                // 3. Mettre le bouton en mode SUCCÈS (Vert)
+                btn.disabled = true;
+                btn.classList.add('success');
+                btn.innerHTML = `
+                    <span class="btn-main-text" style="color:white;">Commande Confirmée !</span>
+                    <span class="btn-sub-text" style="color:white; background:rgba(0,0,0,0.2);">Merci pour votre confiance</span>
+                `;
+
+                // 4. Attendre 10 secondes puis remettre le bouton normal
+                setTimeout(() => {
+                    btn.classList.remove('success');
+                    btn.disabled = false;
+                    btn.innerHTML = `
+                        <span class="btn-main-text" id="btn-main-text">Cliquez ici pour commander</span>
+                        <span class="btn-sub-text" id="btn-subtitle"></span>
+                    `;
+                    updateButtonPrice(); // Remet le prix à jour
+                }, 10000);
+
             } else {
                 alert('Erreur lors de l\'envoi. Veuillez réessayer.');
                 btn.disabled = false;
